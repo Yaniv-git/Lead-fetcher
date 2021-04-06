@@ -1,10 +1,32 @@
 import json
 from enums import *
 from file_downloader import FileDownloader
-from os import path
+from os import path, listdir
 import requests
 
 class NpmPackageHandler():
+
+    @staticmethod
+    def get_result_statistics():
+        statistics = {}
+        for directory in listdir(CONFIG.NPM_DOWNLOADED_PACKAGES_PATH.value):
+            current_path = path.join(CONFIG.NPM_DOWNLOADED_PACKAGES_PATH.value,directory)
+            current_package = directory
+            if path.isdir(current_path):
+                result_file_path = path.join(current_path,CONFIG.RESULT_FILE_NAME.value)
+                try:
+                    results = json.load(open(result_file_path,"r"))
+                    statistics[current_package] = {}
+                    statistics[current_package]["package"] = current_package
+                    for lead in results["results"]:
+                        if lead['extra']['severity'] not in statistics[current_package].keys():
+                            statistics[current_package][lead['extra']['severity']] = 1
+                        else:
+                            statistics[current_package][lead['extra']['severity']] += 1
+                except:
+                    pass
+
+        return {"status":"success","results":list(statistics.values())}
 
     @staticmethod
     def convert_latest_to_version(pacakge_name):
