@@ -1,12 +1,10 @@
-from flask import Flask, Response
-import os
-import requests
-import shutil
-from npm_package_handeler import NpmPackageHandler
+from flask import Flask, Response, Request
+from npm_package_handler import NpmPackageHandler
 from enums import *
 import json
 from semgrep_runner import SemgrepRunner
 from flask_cors import CORS
+from sourceviewer_handler import Sourceviewer_handler
 
 app = Flask(__name__)
 CORS(app, resources={r"*": {"origins": "*"}})
@@ -29,6 +27,22 @@ def npm_dashboard_handler():
     npm_scan_statistics = NpmPackageHandler.get_result_statistics()
     return Response(json.dumps(npm_scan_statistics), mimetype=MIMETYPE.JSON.value)
 
+@app.route('/api/v1/sourceview/<lang>/<pacakge_id>')
+def sourceview_handler(lang, pacakge_id):
+    file_tree = Sourceviewer_handler.get_file_tree(fr"downloaded_packages/{lang}/{pacakge_id}")
+    return Response(json.dumps(file_tree), mimetype=MIMETYPE.JSON.value)
+
+@app.route('/api/v1/file/<path:file_path>')
+def file_data_handler(file_path):
+    return Response(json.dumps(Sourceviewer_handler.get_file_data(file_path)), mimetype=MIMETYPE.JSON.value)
+
+'''@app.route('/api/v1/packages')
+def get_downloaded_packages_list():
+    return Response(json.dumps(Sourceviewer_handler.get_downloaded_packages()), mimetype=MIMETYPE.JSON.value)'''
+
+@app.route('/api/v1/packages')
+def get_downloaded_packages_data():
+    return Response(json.dumps(Sourceviewer_handler.get_packages_result_statistics()), mimetype=MIMETYPE.JSON.value)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000, host="0.0.0.0")

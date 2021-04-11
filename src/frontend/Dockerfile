@@ -1,4 +1,4 @@
-FROM node:10-slim
+FROM node:15.13.0-slim
 
 COPY . /app
 

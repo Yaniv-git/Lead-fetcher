@@ -17,7 +17,7 @@ class NewScan extends Component {
         let lang = this.state.radioState
         packages.forEach(function(packages_node, idx, array){
             console.log(lang)
-            if (packages_node.indexOf("@") > -1)
+            if (packages_node.indexOf("@") > 0)
             {
                 var [package_name, version] = packages_node.split("@");
             }
@@ -54,7 +54,7 @@ class NewScan extends Component {
                 <Space size={30} style={{width:"100%"}} direction="vertical">
                     <Radio.Group style={{"position": "absolute", "left": "25px"}} onChange={onLangChange} value={this.state.radioState}>
                         <Radio value="npm">NPM</Radio>
-                        <Radio value="pip">PIP</Radio>
+                        <Radio value="pip" disabled>PIP</Radio>
                     </Radio.Group>
                     <Input placeholder="Packages" id="packages_input"/>
                     <Button type="primary" loading={loading} onClick={() => this.enterLoading()}>
