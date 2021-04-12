@@ -5,10 +5,10 @@
  Currently the supported repositories are:
   - NPM
  ## Installation
-Clone the repo to a local folder and run `docker compose up`, this will run the backend API server in a docker on port 5000.
-The whole backend folder is mounted so adding/removing rules will have direct effect.
+Clone the repo to a local folder and run `docker compose up`, this will run the backend API server in a docker on port `5000`.
+The whole backend folder is mounted to the docker so adding/removing rules will have a direct effect.
 
-To run the front end, from the frontend/ folder these commands sould be run:
+To run the front end, from the frontend/ folder these commands sould be run (the will run the frontend on port `3000`):
 ```
 npm install 
 npm start
