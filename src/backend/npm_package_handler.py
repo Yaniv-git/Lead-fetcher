@@ -1,7 +1,7 @@
 import json
 from enums import *
 from file_downloader import FileDownloader
-from os import path, listdir
+from os import path, listdir, rename
 import requests
 
 class NpmPackageHandler():
@@ -46,6 +46,13 @@ class NpmPackageHandler():
             return {"status": STATUS.SUCCESS.value, "path": result_file_path}
         return {"status": STATUS.ERROR.value, "path": result_file_path}
 
+    @staticmethod
+    def _get_licenses(package_metadata_json):
+        if "licenses" in package_metadata_json.keys():
+            return list(map(lambda x: x["type"], package_metadata_json["licenses"]))
+        if "license" in package_metadata_json.keys():
+            return [package_metadata_json["license"]]
+        return ["Could not resolve"]
 
     @staticmethod
     def download_npm_package(pacakge_name, version):
@@ -58,6 +65,9 @@ class NpmPackageHandler():
         file_path = path.join(CONFIG.NPM_DOWNLOADED_PACKAGES_PATH.value, file_name)
         FileDownloader.download_file(package_tar_url, file_path)
         extracted_path = FileDownloader.extract_file(file_path)
+        license_path = path.join(extracted_path, CONFIG.LICENSE_FILE_NAME.value)
+        if not path.exists(license_path):
+            open(license_path, "w").write(json.dumps(NpmPackageHandler._get_licenses(response)))
         return {"status": STATUS.SUCCESS.value, "path": extracted_path}
 
 

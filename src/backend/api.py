@@ -5,6 +5,7 @@ import json
 from semgrep_runner import SemgrepRunner
 from flask_cors import CORS
 from sourceviewer_handler import Sourceviewer_handler
+from shutil import rmtree
 
 app = Flask(__name__)
 CORS(app, resources={r"*": {"origins": "*"}})
@@ -43,6 +44,16 @@ def get_downloaded_packages_list():
 @app.route('/api/v1/packages')
 def get_downloaded_packages_data():
     return Response(json.dumps(Sourceviewer_handler.get_packages_result_statistics()), mimetype=MIMETYPE.JSON.value)
+
+@app.route('/api/v1/delete/<lang>/<pacakge_id>')
+def delete_downloaded_package(lang, pacakge_id):
+    if ".." in lang or ".." in pacakge_id:
+        return Response(json.dumps({"status": STATUS.ERROR.value, "message": "path traversal attempt"}), mimetype=MIMETYPE.JSON.value)
+    package_path = path.join(CONFIG.DOWNLOADED_PACKAGES_PATH.value, lang, pacakge_id)
+    if path.exists(package_path):
+        rmtree(package_path)
+    return Response(json.dumps({"status":STATUS.SUCCESS.value}), mimetype=MIMETYPE.JSON.value)
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000, host="0.0.0.0")

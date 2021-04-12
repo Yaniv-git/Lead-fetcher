@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
-import { Divider, Card, Col, Row, Space, Alert, Spin } from "antd";
+import { Divider, Card, Col, Row, Space, Alert, Spin, Empty } from "antd";
 import {Link} from "react-router-dom"
-import { DeleteOutlined, CodeOutlined, DashboardOutlined, LoadingOutlined } from '@ant-design/icons';
+import { CheckCircleTwoTone, CloseCircleTwoTone, DeleteOutlined, CodeOutlined, DashboardOutlined, LoadingOutlined } from '@ant-design/icons';
 
 const { Meta } = Card;
 
@@ -30,6 +30,20 @@ class DownloadedPackageViewer extends Component {
         }
     }
 
+    checkIfLicenseAllowed(licenses)
+    {
+        for (var j = 0; j < licenses.length; j++)
+        {
+            for (var i = 0; i < window.allowedLicences.length; i++) {
+                if(licenses[j]?.indexOf(window.allowedLicences[i]) > -1) 
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     async sortResults(results)
     {
       await results.sort((firstNode, secondNode) => {
@@ -44,6 +58,15 @@ class DownloadedPackageViewer extends Component {
       return new Promise((resolve) => {resolve(results);})
     }
 
+    async deleteScan(lang, packageId)
+    {
+        let res = await fetch(`http://localhost:5000/api/v1/delete/${lang}/${packageId}`,{ mode: 'cors'});
+        if (res.status === 200)
+        {
+            this.getData();
+        }
+    }
+
     async componentDidMount()
     {
         this.getData();
@@ -55,13 +78,25 @@ class DownloadedPackageViewer extends Component {
             <div> {this.state.res_json}
                 <Row style={{ textAlign: 'left' }} gutter={25}>               
                     {Object.keys(this.state.packages.results).map((lang) => {
+                        if (this.state.packages.results[lang].length === 0){
+                            return (
+                                <Col span={24 / Object.keys(this.state.packages.results).length}>
+                                    <Divider orientation="left">{lang}</Divider>
+                                    <Empty description={
+                                    <span>
+                                    No Scans
+                                    </span>
+                                    }/>
+                                </Col>)
+                        }
+
                         return (                
                                 <Col span={24 / Object.keys(this.state.packages.results).length}>
                                         <Divider orientation="left">{lang}</Divider>
                                         <Space size={12} direction="vertical" style={{ width: "100%" }}>
                                         {this.state.packages.results[lang].map((packageResult) => {
                                                 return (
-                                                        <Card
+                                                        <Card 
                                                             actions={[                                                                
                                                                 (<Link key={`dashboard-${packageResult.package}`} to={`/results/${lang}/${packageResult.package.substring(0,packageResult.package.lastIndexOf('-'))}/${packageResult.package.substring(packageResult.package.lastIndexOf('-')+1)}`}>
                                                                 <DashboardOutlined key="edit" />
@@ -69,8 +104,7 @@ class DownloadedPackageViewer extends Component {
                                                                 (<Link key={`sourceviewer-${packageResult.package}`} to={`/sourceviewer/${lang}/${packageResult.package}`}>
                                                                 <CodeOutlined key="setting" />
                                                                 </Link>),
-                                                            
-                                                                <DeleteOutlined key="ellipsis" />,
+                                                                <DeleteOutlined key="ellipsis" onClick={() => {if(packageResult?.status !== "loading"){this.deleteScan(lang, packageResult.package)}}}/>,
                                                             ]}
                                                         >
                                                             <Meta
@@ -86,7 +120,11 @@ class DownloadedPackageViewer extends Component {
                                                                         </Space>
                                                                     </Col>
                                                                 </Row>}
-                                                            
+                                                            description = {
+                                                                this.checkIfLicenseAllowed(packageResult?.licenses) ? 
+                                                                (<span><CheckCircleTwoTone twoToneColor="#52c41a" /> {packageResult?.licenses.toString()}</span>):
+                                                                (<span><CloseCircleTwoTone twoToneColor="#eb2f2f" /> {packageResult?.licenses.toString()}</span>)                                                            
+                                                            }                                                            
                                                             />
                                                         </Card>
                                                 )

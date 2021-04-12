@@ -6,7 +6,7 @@ import NewScan from './components/newScan';
 import NotFoundPage from "./components/404.jsx"
 import Navbar from "./components/navbar.jsx"
 import ScanAnalysis from "./components/scanAnalysis.jsx"
-import SourceViewer from "./components/sourceViewer/sourceViewer.jsx"
+import SourceViewer from "./components/sourceViewer.jsx"
 import DownloadedPackageViewer from "./components/downloadedPackageViewer.jsx"
 
 
@@ -22,6 +22,10 @@ window.extensionToLangConverter = {
   "css": "css",
   "html": "http"
 }
+
+window.allowedLicences = [
+  "MIT", "BSD", "ISC", "MPL"
+]
 
 function App() {
 

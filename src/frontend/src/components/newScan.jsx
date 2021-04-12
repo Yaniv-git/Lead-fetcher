@@ -13,7 +13,7 @@ class NewScan extends Component {
         let packages = document.querySelector("#packages_input").value.split(",")
         
         this.stateChange("loading", 1);
-        setTimeout(() => {this.stateChange("loading", 0);document.location = `/dashboard/${this.state.radioState}`}, 2000);
+        setTimeout(() => {this.stateChange("loading", 0);document.location = `/packages`}, 2000);
         let lang = this.state.radioState
         packages.forEach(function(packages_node, idx, array){
             console.log(lang)

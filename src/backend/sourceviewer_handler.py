@@ -73,8 +73,11 @@ class Sourceviewer_handler():
                 current_path = path.join(lang_path, package)
                 current_package = package
                 if path.isdir(current_path):
-                    result_file_path = path.join(current_path,CONFIG.RESULT_FILE_NAME.value)
+                    license_path = path.join(current_path, CONFIG.LICENSE_FILE_NAME.value)
+                    result_file_path = path.join(current_path, CONFIG.RESULT_FILE_NAME.value)
                     statistics[lang][current_package] = {}
+                    if path.exists(license_path):
+                        statistics[lang][current_package]["licenses"] = json.load(open(license_path, "r"))
                     statistics[lang][current_package]["package"] = current_package
                     try:
                         results = json.load(open(result_file_path,"r"))
