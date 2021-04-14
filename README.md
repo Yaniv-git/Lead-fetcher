@@ -1,4 +1,4 @@
- # AcSAST
+ # Lead-Fetcher
  This tool is meant to find 0-days in open source packages. The engine uses the open source AST SAST tool named [Semgrep](https://semgrep.dev/).
  The backend is written in python (flask API) and the frontend with React (I used ant design for most of the components).
  ## supported repositories
