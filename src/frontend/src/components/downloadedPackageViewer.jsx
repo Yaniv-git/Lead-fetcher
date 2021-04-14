@@ -1,50 +1,18 @@
-import React, {Component} from 'react';
-import { Divider, Card, Col, Row, Space, Alert, Spin, Empty } from "antd";
-import {Link} from "react-router-dom"
-import { CheckCircleTwoTone, CloseCircleTwoTone, DeleteOutlined, CodeOutlined, DashboardOutlined, LoadingOutlined } from '@ant-design/icons';
+import React, {useEffect, useState} from 'react';
+import { Divider, Col, Row, Space, Empty } from "antd";
+import { DownloadedPackageCard } from "./downloadedPackageCard.jsx"
+import { fetchPackagesData } from "../apiHandler.js";
 
-const { Meta } = Card;
 
-class DownloadedPackageViewer extends Component {
-    state = { 
-        packages: {
-            status:"",
-            results:{}
-        }
-     }
 
-    async getData()
-    {
-        // /api/v1/packages
-        let res = await fetch(`http://localhost:5000/api/v1/packages`,{ mode: 'cors'});
-        if (res.status === 200)
-        {
-            let res_json = await res.json();
-            await Object.keys(res_json.results).map((lang) => {
-                return this.sortResults(res_json.results[lang]);
-            }) 
+function DownloadedPackageViewer()
+{
+    const [packages, setPackages] = useState({
+        status:"",
+        results:{}
+    })
 
-            this.setState({
-                packages: res_json
-            });
-        }
-    }
-
-    checkIfLicenseAllowed(licenses)
-    {
-        for (var j = 0; j < licenses.length; j++)
-        {
-            for (var i = 0; i < window.allowedLicences.length; i++) {
-                if(licenses[j]?.indexOf(window.allowedLicences[i]) > -1) 
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    async sortResults(results)
+    const sortResults = async (results) =>
     {
       await results.sort((firstNode, secondNode) => {
         if(firstNode?.ERROR > secondNode?.ERROR || (firstNode?.ERROR && !secondNode?.ERROR)){return -1}
@@ -58,85 +26,53 @@ class DownloadedPackageViewer extends Component {
       return new Promise((resolve) => {resolve(results);})
     }
 
-    async deleteScan(lang, packageId)
+    const getData = () =>
     {
-        let res = await fetch(`http://localhost:5000/api/v1/delete/${lang}/${packageId}`,{ mode: 'cors'});
-        if (res.status === 200)
-        {
-            this.getData();
-        }
+        fetchPackagesData().then
+        ( async (res_json) =>
+            {
+                await Object.keys(res_json.results).map((lang) => {
+                    return sortResults(res_json.results[lang]);
+                }) 
+                setPackages(res_json);
+            }
+        );
     }
 
-    async componentDidMount()
-    {
-        this.getData();
-    }
+    useEffect(() => {getData()}, [])
 
-    render() { 
+    return ( 
+        <div>
+            <Row style={{ textAlign: 'left' }} gutter={25}>               
+                {Object.keys(packages.results).map((lang) => {
+                    if (packages.results[lang].length === 0){
+                        return (
+                            <Col span={24 / Object.keys(packages.results).length}>
+                                <Divider orientation="left">{lang}</Divider>
+                                <Empty description={
+                                <span>
+                                No Scans
+                                </span>
+                                }/>
+                            </Col>)
+                    }
 
-        return ( 
-            <div> {this.state.res_json}
-                <Row style={{ textAlign: 'left' }} gutter={25}>               
-                    {Object.keys(this.state.packages.results).map((lang) => {
-                        if (this.state.packages.results[lang].length === 0){
-                            return (
-                                <Col span={24 / Object.keys(this.state.packages.results).length}>
-                                    <Divider orientation="left">{lang}</Divider>
-                                    <Empty description={
-                                    <span>
-                                    No Scans
-                                    </span>
-                                    }/>
-                                </Col>)
-                        }
-
-                        return (                
-                                <Col span={24 / Object.keys(this.state.packages.results).length}>
-                                        <Divider orientation="left">{lang}</Divider>
-                                        <Space size={12} direction="vertical" style={{ width: "100%" }}>
-                                        {this.state.packages.results[lang].map((packageResult) => {
-                                                return (
-                                                        <Card 
-                                                            actions={[                                                                
-                                                                (<Link key={`dashboard-${packageResult.package}`} to={`/results/${lang}/${packageResult.package.substring(0,packageResult.package.lastIndexOf('-'))}/${packageResult.package.substring(packageResult.package.lastIndexOf('-')+1)}`}>
-                                                                <DashboardOutlined key="edit" />
-                                                                </Link>),
-                                                                (<Link key={`sourceviewer-${packageResult.package}`} to={`/sourceviewer/${lang}/${packageResult.package}`}>
-                                                                <CodeOutlined key="setting" />
-                                                                </Link>),
-                                                                <DeleteOutlined key="ellipsis" onClick={() => {if(packageResult?.status !== "loading"){this.deleteScan(lang, packageResult.package)}}}/>,
-                                                            ]}
-                                                        >
-                                                            <Meta
-                                                            title={
-                                                                <Row>
-                                                                    <Col>{packageResult.package}</Col>
-                                                                    <Col style={{position:"absolute",right:20, top:"10%",marginTop:"auto"}}>
-                                                                        <Space direction="horizontal">
-                                                                            {packageResult?.ERROR ? <Alert style={{width: "max-content"}} showIcon message={packageResult.ERROR} type="error"/>: undefined }
-                                                                            {packageResult?.WARNING ? <Alert style={{width: "max-content"}} showIcon message={packageResult.WARNING} type="warning"/>: undefined }
-                                                                            {packageResult?.INFO ? <Alert style={{width: "max-content"}} showIcon message={packageResult.INFO} type="info"/>: undefined }
-                                                                            {packageResult?.status === "loading" ? <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin/>}/>: undefined }
-                                                                        </Space>
-                                                                    </Col>
-                                                                </Row>}
-                                                            description = {
-                                                                this.checkIfLicenseAllowed(packageResult?.licenses) ? 
-                                                                (<span><CheckCircleTwoTone twoToneColor="#52c41a" /> {packageResult?.licenses.toString()}</span>):
-                                                                (<span><CloseCircleTwoTone twoToneColor="#eb2f2f" /> {packageResult?.licenses.toString()}</span>)                                                            
-                                                            }                                                            
-                                                            />
-                                                        </Card>
-                                                )
-                                            })}
-                                        </Space>
-                                </Col>     
-                        )
-                    })}
-                </Row>
-            </div> 
-         );
-    }
+                    return (                
+                        <Col span={24 / Object.keys(packages.results).length}>
+                                <Divider orientation="left">{lang}</Divider>
+                                <Space size={12} direction="vertical" style={{ width: "100%" }}>
+                                {packages.results[lang].map((packageResult) => {
+                                    return (
+                                        <DownloadedPackageCard package={packageResult.package} lang={lang} status={packageResult?.status} licenses={packageResult?.licenses} ERROR={packageResult?.ERROR} INFO={packageResult?.INFO} WARNING={packageResult?.WARNING}/>         
+                                    )
+                                    })}
+                                </Space>
+                        </Col>     
+                    )
+                })}
+            </Row>
+        </div> 
+     );
 }
- 
+
 export default DownloadedPackageViewer;
