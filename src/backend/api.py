@@ -6,6 +6,7 @@ from semgrep_runner import SemgrepRunner
 from flask_cors import CORS
 from sourceviewer_handler import Sourceviewer_handler
 from shutil import rmtree
+from os import makedirs, path
 
 app = Flask(__name__)
 CORS(app, resources={r"*": {"origins": "*"}})
@@ -66,6 +67,9 @@ def new_delete_downloaded_package():
     else:
         return Response(json.dumps({"status": STATUS.ERROR.value}), mimetype=MIMETYPE.JSON.value)
 
+
 if __name__ == '__main__':
+    if not path.exists(CONFIG.NPM_DOWNLOADED_PACKAGES_PATH.value):
+        makedirs(CONFIG.NPM_DOWNLOADED_PACKAGES_PATH.value)
     app.run(debug=True, port=5000, host="0.0.0.0")
 

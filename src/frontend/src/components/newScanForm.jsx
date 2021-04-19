@@ -23,9 +23,17 @@ function NewScanForm()
         setLoading(true);
 
         await packages.forEach(function(packages_node){
-            if (packages_node.indexOf("@") > 0)
+            if (packages_node.lastIndexOf("@") > 0)
             {
-                var [package_name, version] = packages_node.split("@");
+                if (packages_node.indexOf("@") === 0) 
+                {
+                    var [,package_name, version] = packages_node.split("@");
+                    package_name = "@"+package_name;
+                }
+                else
+                {
+                    var [package_name, version] = packages_node.split("@");
+                }
             }
             else
             {

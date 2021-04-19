@@ -18,7 +18,7 @@ export function PieChart(params)
 
     useEffect(() => {getPieStatistics(params.resultsData)}, [])
 
-    if (pieChartValues.type == 'no data')
+    if (pieChartValues.type === 'no data')
     {return(<></>)}
     
     return(

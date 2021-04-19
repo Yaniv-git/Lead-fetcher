@@ -21,7 +21,7 @@ export function ColumnChart(params)
 
     useEffect(() => {getColumnStatistics(params.resultsData)}, [])
 
-    if (columnChartValues.type == 'no data')
+    if (columnChartValues.type === 'no data')
     {return(<></>)}
 
     return(
