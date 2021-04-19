@@ -14,21 +14,21 @@ function ScanResultViewer()
     const { lang, packageName, packageVersion } = useParams();
 
     const getResultsData = async () =>
-    {      
-      /*if(res_json?.status !== "error")
-        {
-            severityPieStatistics = await this.getPieStatistics(res_json)
-            VulnerabilityColumnStatistics = await this.getColumnStatistics(res_json)*/
+    {
       fetchScan(lang, packageName, packageVersion).then
       ( async (res_json) =>
           {
+            if(res_json?.status !== "error")
+            {
               res_json.results = await sortResults(res_json.results);
               setResults({results:res_json.results});
+            }
+            else
+            {
+              setResults(res_json);
+            }
           }
-      );
-  
-
-          
+      );          
     }
 
     const sortResults = async(results) =>
@@ -46,19 +46,19 @@ function ScanResultViewer()
     useEffect(() => {      
       getResultsData();
       }, [])
-
+      
     if(results?.status === "error")
     {
       return (  
       <Empty description={
           <span>
-            {results?.message}
+            {JSON.stringify(results?.message)}
           </span>
         }/>
       );
     }
       
-    if (results?.status === "loading")
+    if (results?.status === "loading" || results.results === undefined)
     {
       return ( 
         <div>
