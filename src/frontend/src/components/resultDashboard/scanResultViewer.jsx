@@ -58,7 +58,7 @@ function ScanResultViewer()
       );
     }
       
-    if (results?.status === "loading" || results.results === undefined)
+    if (results?.status === "loading")
     {
       return ( 
         <div>
