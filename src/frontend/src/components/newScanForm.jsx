@@ -21,27 +21,27 @@ function NewScanForm()
     const scan = async () => {
         let packages = document.querySelector("#packages_input").value.split(",");
         setLoading(true);
-
-        await packages.forEach(function(packages_node){
-            if (packages_node.lastIndexOf("@") > 0)
+        var version, packageName;
+        await packages.forEach(function(packagesNode){
+            if (packagesNode.lastIndexOf("@") > 0)
             {
-                if (packages_node.indexOf("@") === 0) 
+                if (packagesNode.indexOf("@") === 0) 
                 {
-                    var [,package_name, version] = packages_node.split("@");
-                    package_name = "@"+package_name;
+                    [,packageName, version] = packagesNode.split("@");
+                    packageName = "@"+packageName;
                 }
                 else
                 {
-                    var [package_name, version] = packages_node.split("@");
+                    [packageName, version] = packagesNode.split("@");
                 }
             }
             else
             {
                 version = "latest";
-                package_name = packages_node;
+                packageName = packagesNode;
             }
-            fetchScan(radioState, package_name.trim(), version.trim());
-            showLoadingMessage(`Scanning ${package_name.trim()} - ${version.trim()}`, 2500);
+            fetchScan(radioState, packageName.trim(), version.trim());
+            showLoadingMessage(`Scanning ${packageName.trim()} - ${version.trim()}`, 2500);
         });
         setLoading(false);
     };

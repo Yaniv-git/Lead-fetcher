@@ -43,6 +43,13 @@ export async function fetchFileData(path)
     return new Promise((resolve) => (resolve(jsonResponse)));
 }
 
+export async function searchInFiles(lang, packageId, query)
+{
+    var url = await constructURL(`api/v1/searchinfiles`,{lang: lang, package_id: packageId, query: query});
+    var jsonResponse = await getJson(url);
+    return new Promise((resolve) => (resolve(jsonResponse)));
+}
+
 export async function fetchPackagesData()
 {
     var url = await constructURL(`api/v1/packages`);

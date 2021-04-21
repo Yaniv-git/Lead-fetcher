@@ -5,6 +5,24 @@ import json
 class Sourceviewer_handler():
 
     @staticmethod
+    def search_string_in_directory(dir_path, query):
+        results = []
+        if path.isdir(dir_path) and len(query) > 2:
+            for current_path, directories, files in walk(dir_path):
+                for file_name in files:
+                    file_path = path.join(current_path, file_name)
+                    file_result = {"file_path": file_path, "results": []}
+                    with open(file_path, "r") as read_obj:
+                        line_num = 0
+                        for line in read_obj:
+                            line_num += 1
+                            if query in line:
+                                file_result['results'].append({"line_num": line_num, "code": line[:500]})
+                    if len(file_result['results']) > 0:
+                        results.append(file_result)
+        return results
+
+    @staticmethod
     def get_file_tree(dir_path):
         if path.isdir(dir_path):
             walker = walk(dir_path)

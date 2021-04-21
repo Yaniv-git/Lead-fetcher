@@ -13,7 +13,7 @@ CORS(app, resources={r"*": {"origins": "*"}})
 
 
 @app.route('/api/v1/npm')
-def new_npm_scan_handler():
+def npm_scan_handler():
     package_name = request.args.get('package_name')
     version = request.args.get('version', default="latest")
     if package_name:
@@ -31,7 +31,7 @@ def new_npm_scan_handler():
 
 
 @app.route('/api/v1/sourceview')
-def new_sourceview_handler():
+def sourceview_handler():
     lang = request.args.get('lang')
     package_id = request.args.get('package_id')
     if package_id and lang:
@@ -41,19 +41,27 @@ def new_sourceview_handler():
         return Response(json.dumps({"status": STATUS.ERROR.value}), mimetype=MIMETYPE.JSON.value)
 
 @app.route('/api/v1/file')
-def new_file_data_handler():
+def file_data_handler():
     file_path = request.args.get('path')
     if file_path:
         return Response(json.dumps(Sourceviewer_handler.get_file_data(file_path)), mimetype=MIMETYPE.JSON.value)
     else:
         return Response(json.dumps({"status": STATUS.ERROR.value}), mimetype=MIMETYPE.JSON.value)
 
+@app.route('/api/v1/searchinfiles')
+def search_in_file_handler():
+    query = request.args.get('query')
+    lang = request.args.get('lang')
+    package_id = request.args.get('package_id')
+    return Response(json.dumps(Sourceviewer_handler.search_string_in_directory(path.join(CONFIG.DOWNLOADED_PACKAGES_PATH.value, lang, package_id), query)), mimetype=MIMETYPE.JSON.value)
+
+
 @app.route('/api/v1/packages')
 def get_downloaded_packages_data():
     return Response(json.dumps(Sourceviewer_handler.get_packages_result_statistics()), mimetype=MIMETYPE.JSON.value)
 
 @app.route('/api/v1/delete')
-def new_delete_downloaded_package():
+def delete_downloaded_package():
     lang = request.args.get('lang')
     package_id = request.args.get('package_id')
     if package_id and lang:

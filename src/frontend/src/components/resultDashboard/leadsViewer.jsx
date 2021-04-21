@@ -24,7 +24,7 @@ export function LeadsViewer(params)
                         <Row>
                         <Col><Alert style={{width: "max-content", "max-width": "100%"}} showIcon message={lead.check_id} type={lead.extra?.severity?.toLowerCase()}/></Col>
                         <Col style={{position:"absolute",right:20, top:"25%",marginTop:"auto"}}>
-                            <Link to={`/sourceviewer/${lead.path.substring(lead.path.lastIndexOf(`${params.lang}`))}`}><Button  icon={<CodeOutlined />} /></Link>
+                            <Link to={`/sourceviewer/${lead.path.substring(lead.path.lastIndexOf(`${params.lang}`))}#${lead.start.line}`}><Button  icon={<CodeOutlined />} /></Link>
                         </Col>
                         </Row>
                     } key={index} className="site-collapse-custom-panel">

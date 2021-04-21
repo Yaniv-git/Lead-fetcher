@@ -6,6 +6,7 @@ import { createBrowserHistory } from 'history';
 import { LoadingOutlined } from '@ant-design/icons';
 import { fetchFileTreeData, fetchFileData } from "../apiHandler.js";
 import { useParams } from "react-router-dom";
+import { SearchCodeInFiles } from "./searchCodeInFiles.jsx";
 
 const loadingIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
@@ -22,10 +23,11 @@ function SourceViewer()
     const [fileSelected, setFileSelected] = useState("");
     const { lang, packageId } = useParams();
     let history = createBrowserHistory();
+    let url = new URL(document.location.href)
 
     const getRestOfUrl = (sliceFromString) =>
-    {
-        let currentUrl = decodeURIComponent(document.location.href);
+    {        
+        let currentUrl = decodeURIComponent(url.pathname);
         currentUrl = currentUrl.slice(currentUrl.indexOf(sliceFromString) + sliceFromString.length);
         return new Promise((resolve) => {resolve(currentUrl)})
     }
@@ -86,38 +88,65 @@ function SourceViewer()
         setSelectedKeys([info.node.key]);
     };
 
-    useEffect(async() => 
-    {
-        getTreeData();
-        let urlFilePath = await getRestOfUrl(`/sourceviewer/`);
-        if (urlFilePath.length > 0)
-        {
-            getFileData(urlFilePath);
-        }  
+    useEffect(() => 
+    {        
+        async function fetchData() {
+            getTreeData();
+            let urlFilePath = await getRestOfUrl(`/sourceviewer/`);
+            if (urlFilePath.length > 0)
+            {
+                getFileData(urlFilePath);
+            } 
+        }
+        fetchData();      
     }, [])
 
+    
+    if (url.hash && fileData)
+    {
+        let highlighLineIndex = url.hash.replace("#","");       
+        setTimeout(()=>{
+            let lineSpan = document.querySelector(`code>span:nth-child(${highlighLineIndex})`)
+            if(lineSpan && lineSpan.style.backgroundColor === "") {
+                lineSpan.style.backgroundColor = "#84840185";
+                lineSpan.scrollIntoView({ behavior: "smooth", block: "center" });
+            };
+        },200)
+    } 
+              
     return ( 
         <div style={{textAlign:"left"}} >
             
             <Divider><h2>{packageId} {fetching ? <Spin indicator={loadingIcon} /> : <></>}</h2></Divider>
             <Row>
-                <Col flex="none" style={{"min-width":"20%"}}>
-                    <div style={{ padding: '0 16px' }}>
-                        <DirectoryTree style={{"background":"#f0f2f5"}}                          
-                            expandedKeys={expandedKeys}
-                            selectedKeys={selectedKeys}
-                            onSelect={onSelect}
-                            onExpand={(expandedKeysValue) => {setExpandedKeys(expandedKeysValue);}}
-                            treeData={treeData}
-                        />
-                    </div>
-                </Col>
+                <Col flex="none" style={{"min-width":"20%"}}>    
+                <div style={{ padding: '0 16px' }}>
+                    <Divider orientation="left">Directory tree</Divider>            
+                    <Row>
+                        
+                            <DirectoryTree style={{"background":"#f0f2f5"}}                          
+                                expandedKeys={expandedKeys}
+                                selectedKeys={selectedKeys}
+                                onSelect={onSelect}
+                                onExpand={(expandedKeysValue) => {setExpandedKeys(expandedKeysValue);}}
+                                treeData={treeData}
+                            />
+                        
+                    </Row>
+                    <Divider orientation="left">Search</Divider>
+                    <Row style={{"max-heigth":"20%"}}>
+                        <SearchCodeInFiles onResultSelect={(path, lineNum)=>{
+                                         history.push(`/sourceviewer/${path}#${lineNum}`);
+                                         getFileData(path);
+                                        }}/>
+                    </Row>
+                </div>
+                </Col>                
                 <Col flex="auto" style={{"max-width":"80%"}}>
                 
-                        {fileSelected !== "" ? (<SyntaxHighlighter wrapLines showLineNumbers language={window.extensionToLangConverter[fileSelected.split(".").slice(-1)[0]]} style={androidstudio}>
+                        {(fileSelected !== "" && fetching === false) ? (<SyntaxHighlighter wrapLines showLineNumbers language={window.extensionToLangConverter[fileSelected.split(".").slice(-1)[0]]} style={androidstudio}>
                             {fileData}
-                        </SyntaxHighlighter>) : <></>}
-                    
+                        </SyntaxHighlighter>) : <></>}                        
                 </Col>
             </Row>
         </div>
