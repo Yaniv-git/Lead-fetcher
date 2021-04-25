@@ -1,7 +1,7 @@
 import 'antd/dist/antd.css';
 import { Layout, Space } from 'antd';
 import {BrowserRouter as Router, Route, Switch, Redirect} from "react-router-dom"
-import NewScanForm from './components/newScanForm';
+import NewScanPageHandler from './components/newScanPage/newScanPageHandler.jsx';
 import NotFoundPage from "./components/404.jsx"
 import NavigationBar from "./components/navigationBar.jsx"
 import ScanResultViewer from "./components/resultDashboard/scanResultViewer.jsx"
@@ -39,8 +39,8 @@ function App() {
 
                
                 <Switch>
-                  <Route exact path="/scan" component={NewScanForm}/>
-                  <Route exact path="/" component={NewScanForm}/>
+                  <Route exact path="/scan" component={NewScanPageHandler}/>
+                  <Route exact path="/" component={NewScanPageHandler}/>
                   <Route exact path="/results/:lang/:packageName/:packageVersion" component={ScanResultViewer}/>
                   <Route path="/sourceviewer/:lang/:packageId" component={SourceViewer}/>
                   <Route exact path="/packages" component={DownloadedPackageViewer}/>

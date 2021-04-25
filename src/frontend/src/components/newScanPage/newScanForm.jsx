@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Radio, Input, Card, Space } from 'antd';
 import { message, Button } from 'antd';
-import { fetchScan } from "../apiHandler.js";
+import { fetchScan } from "../../apiHandler.js";
 
 function NewScanForm()
 {   

@@ -29,6 +29,13 @@ export async function fetchScan(lang, packageName, version = "latest")
     return new Promise((resolve) => (resolve(jsonResponse)));
 }
 
+export async function fetchNpmKeyword(keyword, page, packagesNum)
+{
+    var url = await constructURL(`api/v1/npmkeyword`,{keyword, page, packages_num: packagesNum});
+    var jsonResponse = await getJson(url);
+    return new Promise((resolve) => (resolve(jsonResponse)));
+}
+
 export async function fetchFileTreeData(lang, packageId)
 {
     var url = await constructURL(`api/v1/sourceview`,{lang: lang, package_id: packageId});

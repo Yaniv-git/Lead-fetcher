@@ -75,4 +75,9 @@ class NpmPackageHandler():
             open(license_path, "w").write(json.dumps(NpmPackageHandler._get_licenses(response)))
         return {"status": STATUS.SUCCESS.value, "path": extracted_path}
 
+    @staticmethod
+    def get_packages_by_keyword(keyword, page ,packages_number):
+        response = requests.get(f"https://www.npmjs.com/search?q={keyword}&ranking=popularity&page={page}&perPage={packages_number}", headers={"x-spiferack":"1"}).json()
+        return {"status":STATUS.SUCCESS.value, "data":response}
+
 
