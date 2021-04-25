@@ -60,6 +60,13 @@ def search_in_file_handler():
 def get_downloaded_packages_data():
     return Response(json.dumps(Sourceviewer_handler.get_packages_result_statistics()), mimetype=MIMETYPE.JSON.value)
 
+@app.route('/api/v1/npmkeyword')
+def get_npm_packages_by_keyword():
+    keyword = request.args.get('keyword')
+    page = request.args.get('page')
+    packages_num = request.args.get('packages_num')
+    return Response(json.dumps(NpmPackageHandler.get_packages_by_keyword(keyword, page, packages_num)), mimetype=MIMETYPE.JSON.value)
+
 @app.route('/api/v1/delete')
 def delete_downloaded_package():
     lang = request.args.get('lang')
