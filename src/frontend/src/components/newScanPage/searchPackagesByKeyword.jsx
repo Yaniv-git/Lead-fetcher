@@ -9,8 +9,6 @@ const { Search } = Input;
 function SearchPackagesByKeyword()
 {
     const [currentPagination, setCurrentPagination] = useState({current: 1, pageSize: 10, total: 0});
-    const [selectedPackages, setSelectedPackages] = useState([]);
-    const [scannigLoading, setScannigLoading] = useState(false);
     const [tableLoading, setTableLoading] = useState(false);
     const [keyword, setKeyword] = useState();
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -65,10 +63,10 @@ function SearchPackagesByKeyword()
                   </Radio.Group> 
                 </Col>
                 <Col flex="auto" style={{textAlign:"left"}}>                  
-                  <Search onSearch={(input) => {setKeyword(input);}} placeholder="Keyword" loading={scannigLoading} />
+                  <Search onSearch={(input) => {setKeyword(input);}} placeholder="Keyword"/>
                 </Col>
                 <Col flex="auto" style={{textAlign:"right"}}>
-                  <Button type="primary" onClick={() => {scanPackages()}} disabled={!hasSelected} loading={scannigLoading}>
+                  <Button type="primary" onClick={() => {scanPackages()}} disabled={!hasSelected}>
                     Scan
                   </Button>
                 </Col>
