@@ -1,0 +1,16 @@
+rules:
+- id: unsafe_serialization_serialize-to-js 
+  message: "unsanitized usage of 'serialize-to-js' may lead to unsafe serialization"
+  patterns:
+  - pattern-inside: |
+      ...
+      $SER = require('serialize-to-js')
+      ...
+  - pattern-not-inside: escape(...)
+  - pattern-not-inside: stringify(...)
+  - pattern: |
+      $SER(...)
+  severity: WARNING
+  languages:
+    - javascript
+    - typescript
