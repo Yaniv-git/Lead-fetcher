@@ -8,7 +8,9 @@ const { Meta } = Card;
 
 export function DownloadedPackageCard(cardData)
 {
-
+	if (typeof cardData.licenses == "undefined") {
+		cardData.licenses = [];
+	}
     const [isDeleted, setIsDeleted] = useState(false);
 
     const checkIfLicenseAllowed = (licenses) =>
