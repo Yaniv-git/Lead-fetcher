@@ -1,0 +1,36 @@
+rules:
+- id: prototype_pollution
+  patterns:
+  - pattern-either:
+    - pattern-inside: function ($FIRST_PARAM, $SECOND_PARAM, ...) {...}
+    - pattern-inside: function $FUNC($FIRST_PARAM, $SECOND_PARAM, ...) {...}
+    - pattern-inside: $X = function $FUNC($FIRST_PARAM, $SECOND_PARAM, ...) {...}
+    - pattern-inside: var $X = function $FUNC($FIRST_PARAM, $SECOND_PARAM, ...) {...};
+    - pattern-inside: $APP.$METHOD(..., function $FUNC($FIRST_PARAM, $SECOND_PARAM, ...) {...})
+  - pattern-either:
+    - pattern-inside: for($KEY in $SECOND_PARAM){...}
+    - pattern-inside: function ($VALUE, $KEY) {...}
+  - pattern-not-inside: |
+        ...
+        if(<... "__proto__" ...>){...}
+        ...
+  - pattern-either:
+    - pattern: |
+        $FIRST_PARAM[$A] = $SECOND_PARAM[$KEY]
+    - pattern: |
+        $VALUE = $SECOND_PARAM[$KEY]
+    - pattern: |
+        $VALUE = $SECOND_PARAM[$KEY]
+        ...
+        $FIRST_PARAM[$A] = $X
+    - pattern: |
+        $X[$KEY] = $VALUE
+  message: >-
+    Prototype pollution, check if the arguments of the function are user controlled.
+  languages:
+  - javascript
+  severity: ERROR
+  metadata:
+    owasp: 'A1: Injection'
+    cwe: >-
+      CWE-1321: Improperly Controlled Modification of Object Prototype Attributes ('Prototype Pollution')
