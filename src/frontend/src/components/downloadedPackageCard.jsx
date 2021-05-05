@@ -13,7 +13,7 @@ export function DownloadedPackageCard(cardData)
 
     const checkIfLicenseAllowed = (licenses) =>
     {
-        for (var j = 0; j < licenses.length; j++)
+        for (var j = 0; j < licenses?.length; j++)
         {
             for (var i = 0; i < window.allowedLicences.length; i++) {
                 if(licenses[j]?.indexOf(window.allowedLicences[i]) > -1) 
