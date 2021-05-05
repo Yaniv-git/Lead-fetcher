@@ -1,0 +1,36 @@
+rules:
+- id: unsafe_deserialization
+  message: "Unsanitized usage of 'node-serialize' or 'serialize-to-js' may lead to code execution on deserialization."
+  patterns:
+  - pattern-either:
+    - pattern-inside: |
+        $SER = require('node-serialize')
+        ...
+    - pattern-inside: |
+        import $SER from 'node-serialize';
+        ...
+    - pattern-inside: |
+        $SER = require('serialize-to-js')
+        ...
+    - pattern-inside: |
+        import $SER from 'serialize-to-js';
+        ...
+  - pattern-not-inside: |
+      escape(...)
+      ...
+  - pattern-not-inside: |
+      stringify(...)
+      ...
+  - pattern-either:
+      - pattern: |
+          $SER.unserialize($OBJ,...)
+      - pattern: |
+          $SER.deserialize($OBJ,...)
+  severity: ERROR
+  languages:
+    - javascript
+    - typescript
+  metadata:
+    owasp: 'A1: Injection'
+    cwe: >-
+      CWE-502: Deserialization of Untrusted Data
