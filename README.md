@@ -1,4 +1,5 @@
  # Lead-Fetcher
+ <img src="https://user-images.githubusercontent.com/59412524/210252370-687abc0b-f60e-457d-8320-e3b992f957f5.png" width=25%>
  This tool is meant to find 0-days in open source packages. The engine uses the open source AST SAST tool named [Semgrep](https://semgrep.dev/).
  The backend is written in python (flask API) and the frontend with React (I used ant design for most of the components).
  ## supported repositories
